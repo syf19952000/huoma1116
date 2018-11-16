@@ -14,7 +14,8 @@
 <div class="container">
     <{foreach $data as $v}>
     <div class="box">
-        <a href="ewm-bianqian?code=<{$v.code}>"><p><span class="zhuse">【<{$v.tname}>】</span><{$v.title}></a>
+        <!-- <a href="ewm-bianqian?code=<{$v.code}>"><p><span class="zhuse">【<{$v.tname}>】</span><{$v.title}></a> -->
+        <a href="ewm-moveCode?code=<{$v.code}>"><p><span class="zhuse">【<{$v.tname}>】</span><{$v.title}></a>
          <span code="<{$v.code}>" class="pull-right glyphicon glyphicon-remove-circle"></span></p>
         <p class="bottom_xu">
             <{if $v.time}>
@@ -64,7 +65,8 @@
         var a = $(this).attr('code');
         var b = $(this).parents('.box');
         $.ajax({
-            url:'./ewm-shanchu',
+            //url:'./ewm-shanchu',
+            url:'ewm-shanchu',
             type:'POST',
             data:{
                 a : a

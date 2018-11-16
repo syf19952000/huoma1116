@@ -95,7 +95,7 @@ class Ctl_Ewm extends Ctl
     {
         $data = $this->GP('data');
         
-        $dir = $_SERVER['DOCUMENT_ROOT'].'/static/imgs';
+        $dir = $_SERVER['DOCUMENT_ROOT'].'/static/imgs';    // 上传的文件夹
         if (!file_exists($dir)) {
             mkdir($dir);
         }
@@ -128,28 +128,38 @@ class Ctl_Ewm extends Ctl
     }
 
     //加载子表内容编辑页面
-    public function edit()
+    public function edit()      // 修改操作统一进这一方法 
     {
-        $id = $this->getlink(9);
+        $id = $this->getlink(9);    // $id['id'] 是content表中的id
         $arr = K::M('code/content')->cfg();
-        $data = K::m('code/bianqian')->chaxun('tid', $id['id']);
-        if (!$data) {
-            $data = K::m('code/huiyi')->chaxun('tid', $id['id']);
+        $arr1 = K::M('code/content')->chaxun('id', $id['id']);
+        foreach($arr1 as $v)
+        {
+            $type_id = $v['type_id'];
         }
-        // var_dump($data);die;
+        switch ($type_id) {
+            case '1':
+                $data = K::m('code/bianqian')->chaxun('tid', $id['id']);
+                break;
+            case '2':
+                $data = K::m('code/huiyi')->chaxun('tid', $id['id']);
+                break;
+            default:
+                # code...
+                break;
+        }
         foreach ($data as $v) {
             $data = $v;
         }
         if (empty($data)) {
             $data['tid'] = $id['id'];
         }
-        $v = K::M('code/content')->chaxun('id', $id['id']);
-        foreach ($v as $val) {
+        foreach ($arr1 as $val) {
             $vv = $val;
         }
-        $link = $arr[$val['type_id']];
+        //$link = $arr[$val['type_id']];      
+        $link = $arr[$vv['type_id']];
         $this->pagedata['data'] = $data;
-
         $this->tmpl = $link . '_edit.html';
     }
 
@@ -199,21 +209,20 @@ class Ctl_Ewm extends Ctl
     //删除二维码
     public function shanchu()
     {
-        
+
         $data = $_POST['a'];
         $shanchu = K::M('code/content')->shanchu($data);
         $returnData = json_encode($shanchu, JSON_UNESCAPED_UNICODE); 
-
         echo $returnData;
         exit;
     }
 
     //扫描二维码进入这个方法
-    public function moveCode()
+    public function moveCode()      
     {
         $data = $this->getlink(13);
-        $code = base64_decode($data['code']);
-        // $code = 'tvqG4u';   //先用假数据
+        $code = $data['code'];
+        //$code = base64_decode($data['code']);
         $data = K::M('code/content')->chaxun('code', $code);
         foreach ($data as $v) {
             $data = $v;
@@ -250,7 +259,7 @@ class Ctl_Ewm extends Ctl
         }
     } 
 
-    //加载便签详情页面
+    //加载便签详情页面，现在详情页链接是 http://www.huomagit1116.com/ewm-bianqian?code=ua0mR9
     public function bianqian($code=0)
     {
         if (!$code) {
@@ -264,15 +273,24 @@ class Ctl_Ewm extends Ctl
         } else {
             foreach ($codeData as $v) {
                 $id = $v;
+                $type_id = $v['type_id'];
             }
-            $bianqian = K::M('code/bianqian')->chaxun('tid', $id['id']);
-            if (!$bianqian) {
-                $bianqian = K::M('code/huiyi')->chaxun('tid', $id['id']);
+            // 也可以把type_id的判断放到模型中判断，ewm中把type_id传到模型中
+            switch ($type_id) {
+                case '1':
+                    $bianqian = K::M('code/bianqian')->chaxun('tid', $id['id']);
+                    break;
+                case '2':
+                    $bianqian = K::M('code/huiyi')->chaxun('tid', $id['id']);
+                    break;
+                default:
+                    # code...
+                    break;
             }
             foreach ($bianqian as $v) {
                 $bianqianData = $v;
             }
-            $link = $arr[$id['type_id']];
+            $link = $arr[$id['type_id']];   // $id 是二维码表中的id
             $this->pagedata['data'] = $bianqianData;
             $this->pagedata['code'] = $id;
 
